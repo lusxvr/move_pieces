@@ -13,7 +13,50 @@ const int DIR_PIN_Y  = 4;
 const int X_ENDSTOP_PIN = 6;  // Adjust as needed
 const int Y_ENDSTOP_PIN = 7;  // Adjust as needed
 
-const int MAGNET_PIN = 10;
+const int MAGNET_PIN = 9;
+
+// Hall Effect Pin Assignments
+const int A1_PIN = 32;
+const int A2_PIN = 30;
+const int A3_PIN = 28;
+const int A4_PIN = 26;
+const int A5_PIN = 24;
+const int A6_PIN = 22;
+
+const int B1_PIN = 44;
+const int B2_PIN = 42;
+const int B3_PIN = 40;
+const int B4_PIN = 38;
+const int B5_PIN = 36;
+const int B6_PIN = 34;
+
+const int C1_PIN = 12;
+const int C2_PIN = 10;
+const int C3_PIN = 52;
+const int C4_PIN = 50;
+const int C5_PIN = 48;
+const int C6_PIN = 46;
+
+const int D1_PIN = 33;
+const int D2_PIN = 31;
+const int D3_PIN = 29;
+const int D4_PIN = 27;
+const int D5_PIN = 25;
+const int D6_PIN = 23;
+
+const int E1_PIN = 45;
+const int E2_PIN = 43;
+const int E3_PIN = 41;
+const int E4_PIN = 39;
+const int E5_PIN = 37;
+const int E6_PIN = 35;
+
+const int F1_PIN = 13;
+const int F2_PIN = 11;
+const int F3_PIN = 53;
+const int F4_PIN = 51;
+const int F5_PIN = 49;
+const int F6_PIN = 47;
 
 // Create two AccelStepper objects for X and Y
 AccelStepper stepperX(AccelStepper::DRIVER, STEP_PIN_X, DIR_PIN_X);
