@@ -58,6 +58,15 @@ const int F4_PIN = 51;
 const int F5_PIN = 49;
 const int F6_PIN = 47;
 
+const int HALL_SENSOR_PINS[36] = {
+  A1_PIN, A2_PIN, A3_PIN, A4_PIN, A5_PIN, A6_PIN,
+  B1_PIN, B2_PIN, B3_PIN, B4_PIN, B5_PIN, B6_PIN,
+  C1_PIN, C2_PIN, C3_PIN, C4_PIN, C5_PIN, C6_PIN,
+  D1_PIN, D2_PIN, D3_PIN, D4_PIN, D5_PIN, D6_PIN,
+  E1_PIN, E2_PIN, E3_PIN, E4_PIN, E5_PIN, E6_PIN,
+  F1_PIN, F2_PIN, F3_PIN, F4_PIN, F5_PIN, F6_PIN
+};
+
 // Create two AccelStepper objects for X and Y
 AccelStepper stepperX(AccelStepper::DRIVER, STEP_PIN_X, DIR_PIN_X);
 AccelStepper stepperY(AccelStepper::DRIVER, STEP_PIN_Y, DIR_PIN_Y);
@@ -80,6 +89,7 @@ const int HOMING_DIR_Y = 1;
 void homeAxis(AccelStepper &stepper, int endstopPin, float homeDirection);
 void movePiece(float startXmm, float startYmm, float endXmm, float endYmm);
 void moveXY(float xMM, float yMM);
+String readBoardState();
 
 void setup() {
   Serial.begin(115200);
@@ -93,6 +103,11 @@ void setup() {
   pinMode(MAGNET_PIN, OUTPUT);
   digitalWrite(MAGNET_PIN, LOW);  // Assuming LOW is OFF for your magnet
 
+  // Initialize all hall effect sensor pins
+  for (int i = 0; i < 36; i++) {
+    pinMode(HALL_SENSOR_PINS[i], INPUT_PULLUP);
+  }
+
   // Basic stepper configuration
   stepperX.setMaxSpeed(MAX_SPEED * STEPS_PER_MM_X);
   stepperX.setAcceleration(MAX_ACC * STEPS_PER_MM_X);
@@ -105,8 +120,9 @@ void setup() {
   homeAxis(stepperY, Y_ENDSTOP_PIN, HOMING_DIR_Y * STEPS_PER_MM_Y);
 
   Serial.println("Homing complete. Type commands like:");
-  Serial.println("  MOVE 5 5 10 10");
-  Serial.println("to move from (5mm,5mm) to (10mm,10mm).");
+  Serial.println("  MOVE 5 5 10 10 - to move from (5mm,5mm) to (10mm,10mm).");
+  Serial.println("  READ_BOARD - Get current board state from sensors");
+
 }
 
 void loop() {
@@ -115,7 +131,15 @@ void loop() {
     cmdString.trim();
     if (cmdString.startsWith("MOVE")) {
       parseMoveCommand(cmdString);
-    } else {
+    }
+    else if (cmdString == "READ_BOARD") {
+      // Read the current state of all sensors
+      String boardState = readBoardState();
+      
+      // Send the board state back to the Python server
+      Serial.println(boardState);
+    }  
+    else {
       Serial.print("Unknown command: ");
       Serial.println(cmdString);
     }
@@ -296,4 +320,24 @@ void homeAxis(AccelStepper &stepper, int endstopPin, float homeDirection) {
   Serial.print("Axis on pin ");
   Serial.print(endstopPin);
   Serial.println(" homed. CurrentPosition set to 0.");
+}
+
+// Function to read all hall effect sensors and return a 36-digit string
+String readBoardState() {
+  String boardState = "";
+  
+  for (int i = 0; i < 36; i++) {
+    // Configure each pin as input with pullup resistor
+    pinMode(HALL_SENSOR_PINS[i], INPUT_PULLUP);
+    
+    // Read the sensor (LOW typically means a piece is present due to magnet)
+    // Note: You may need to invert this logic depending on your sensor setup
+    int sensorValue = digitalRead(HALL_SENSOR_PINS[i]);
+    
+    // Convert to 1 (piece present) or 0 (empty)
+    // Invert the reading since LOW typically means a piece is present
+    boardState += (sensorValue == LOW) ? "1" : "0";
+  }
+  
+  return boardState;
 }
