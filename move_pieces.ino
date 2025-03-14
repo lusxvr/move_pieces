@@ -51,8 +51,8 @@ const int E4_PIN = 39;
 const int E5_PIN = 37;
 const int E6_PIN = 35;
 
-const int F1_PIN = 13;
-const int F2_PIN = 11;
+const int F1_PIN = 11;
+const int F2_PIN = 13;
 const int F3_PIN = 53;
 const int F4_PIN = 51;
 const int F5_PIN = 49;
