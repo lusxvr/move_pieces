@@ -2,16 +2,18 @@
 
 // --- Pin Assignments ---
 // Step/Direction for X motor:
-const int STEP_PIN_X = 2;
-const int DIR_PIN_X  = 1;
+const int STEP_PIN_X = 3;
+const int DIR_PIN_X  = 2;
 
 // Step/Direction for Y motor:
-const int STEP_PIN_Y = 4;
-const int DIR_PIN_Y  = 3;
+const int STEP_PIN_Y = 5;
+const int DIR_PIN_Y  = 4;
 
 // End stop pins (pullup)
-const int X_ENDSTOP_PIN = 5;  // Adjust as needed
-const int Y_ENDSTOP_PIN = 6;  // Adjust as needed
+const int X_ENDSTOP_PIN = 6;  // Adjust as needed
+const int Y_ENDSTOP_PIN = 7;  // Adjust as needed
+
+const int MAGNET_PIN = 10;
 
 // Create two AccelStepper objects for X and Y
 AccelStepper stepperX(AccelStepper::DRIVER, STEP_PIN_X, DIR_PIN_X);
@@ -43,6 +45,10 @@ void setup() {
   // Configure end stop pins as pullups
   pinMode(X_ENDSTOP_PIN, INPUT_PULLUP);
   pinMode(Y_ENDSTOP_PIN, INPUT_PULLUP);
+
+  // Configure magnet pin as output and ensure it starts OFF
+  pinMode(MAGNET_PIN, OUTPUT);
+  digitalWrite(MAGNET_PIN, LOW);  // Assuming LOW is OFF for your magnet
 
   // Basic stepper configuration
   stepperX.setMaxSpeed(MAX_SPEED * STEPS_PER_MM_X);
@@ -145,16 +151,18 @@ void movePiece(float startXmm, float startYmm, float endXmm, float endYmm) {
   moveXY(startXmm, startYmm);
   delay(500);
 
-  // Turn magnet ON (dummy)
-  Serial.println("Magnet ON (dummy)");
+  // Turn magnet ON
+  Serial.println("Magnet ON");
+  digitalWrite(MAGNET_PIN, HIGH);  // Assuming HIGH is ON for your magnet
   delay(500);
 
   Serial.println("Moving to end (drop-off) position...");
   moveXY(endXmm, endYmm);
   delay(500);
 
-  // Turn magnet OFF (dummy)
-  Serial.println("Magnet OFF (dummy)");
+  // Turn magnet OFF
+  Serial.println("Magnet OFF");
+  digitalWrite(MAGNET_PIN, LOW);  // Assuming LOW is OFF for your magnet
   delay(1500);
 
   // Re-home after the move
@@ -229,7 +237,8 @@ void homeAxis(AccelStepper &stepper, int endstopPin, float homeDirection) {
   stepper.setCurrentPosition(0);
 
   // Move away from switch a little so it's no longer pressed
-  long releaseSteps = (long)(homeDirection * -1 * HOMING_RELEASE_MM);
+  long releaseSteps = (long)(homeDirection * -1.0f *  HOMING_RELEASE_MM);
+
   stepper.moveTo(releaseSteps);
 
   while (stepper.distanceToGo() != 0) {
