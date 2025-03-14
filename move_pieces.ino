@@ -76,8 +76,8 @@ const float STEPS_PER_MM_X = 100.0f / 15.0f;
 const float STEPS_PER_MM_Y = 100.0f;
 
 // Speed and Acceleration (in mm/s and mm/s^2, then converted to steps)
-const float MAX_SPEED = 10;  // mm per second
-const int   MAX_ACC   = 5;   // mm/s^2
+const float MAX_SPEED = 25;  // mm per second
+const int   MAX_ACC   = 20;   // mm/s^2
 
 // Homing
 const int   MAX_HOMING_DIST   = 20000; // in mm
@@ -93,7 +93,7 @@ String readBoardState();
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("AccelStepper Homing + Move Demo Beginning...");
+  Serial.println("Chess Controller Starting");
 
   // Configure end stop pins as pullups
   pinMode(X_ENDSTOP_PIN, INPUT_PULLUP);
@@ -199,10 +199,10 @@ void parseMoveCommand(const String &cmdString) {
   ey = args.toFloat();
 
   // Now we have sx, sy, ex, ey
-  Serial.println("Parsed MOVE command with floats:");
-  Serial.print("  Start = ("); Serial.print(sx); Serial.print(", "); Serial.print(sy);
-  Serial.print(") End = (");   Serial.print(ex); Serial.print(", "); Serial.print(ey);
-  Serial.println(")");
+  //Serial.println("Parsed MOVE command with floats:");
+  //Serial.print("  Start = ("); Serial.print(sx); Serial.print(", "); Serial.print(sy);
+  //Serial.print(") End = (");   Serial.print(ex); Serial.print(", "); Serial.print(ey);
+  //Serial.println(")");
 
   // Call your function that does the move
   movePiece(sx, sy, ex, ey);
@@ -214,30 +214,30 @@ void parseMoveCommand(const String &cmdString) {
  *             then re-homes.
  */
 void movePiece(float startXmm, float startYmm, float endXmm, float endYmm) {
-  Serial.println("Moving to start (pick-up) position...");
+  //Serial.println("Moving to start (pick-up) position...");
   moveXY(startXmm, startYmm);
   delay(500);
 
   // Turn magnet ON
-  Serial.println("Magnet ON");
+  //Serial.println("Magnet ON");
   digitalWrite(MAGNET_PIN, HIGH);  // Assuming HIGH is ON for your magnet
   delay(500);
 
-  Serial.println("Moving to end (drop-off) position...");
+  //Serial.println("Moving to end (drop-off) position...");
   moveXY(endXmm, endYmm);
   delay(500);
 
   // Turn magnet OFF
-  Serial.println("Magnet OFF");
+  //Serial.println("Magnet OFF");
   digitalWrite(MAGNET_PIN, LOW);  // Assuming LOW is OFF for your magnet
   delay(1500);
 
   // Re-home after the move
-  Serial.println("Re-homing after move...");
   homeAxis(stepperX, X_ENDSTOP_PIN, HOMING_DIR_X * STEPS_PER_MM_X);
   homeAxis(stepperY, Y_ENDSTOP_PIN, HOMING_DIR_Y * STEPS_PER_MM_Y);
-  Serial.println("Re-homing complete.");
-  Serial.println("OK"); // Here to acknowledge completed move to server
+  //Serial.println("Re-homing complete.");
+  //Serial.println("OK"); // Here to acknowledge completed move to server
+  Serial.println("MOVE_COMPLETE");
 }
 
 /**
@@ -250,6 +250,7 @@ void moveXY(float xMM, float yMM) {
   long xSteps = (long)(xMM * STEPS_PER_MM_X);
   long ySteps = (long)(yMM * STEPS_PER_MM_Y);
 
+  /*
   Serial.print("moveXY: moving to X=");
   Serial.print(xMM); 
   Serial.print("mm ("); 
@@ -259,6 +260,7 @@ void moveXY(float xMM, float yMM) {
   Serial.print("mm (");
   Serial.print(ySteps);
   Serial.println(" steps)");
+  */
 
   // Command both steppers to move
   stepperX.moveTo(-xSteps);
@@ -269,7 +271,7 @@ void moveXY(float xMM, float yMM) {
     stepperX.run();
     stepperY.run();
   }
-  Serial.println("...moveXY done.");
+  //Serial.println("...moveXY done.");
 }
 
 /**
@@ -282,8 +284,8 @@ void moveXY(float xMM, float yMM) {
  *                  which way is "toward" the endstop.
  */
 void homeAxis(AccelStepper &stepper, int endstopPin, float homeDirection) {
-  Serial.print("Homing axis on pin ");
-  Serial.println(endstopPin);
+  //Serial.print("Homing axis on pin ");
+  //Serial.println(endstopPin);
 
   // Start from a "fake" 0
   stepper.setCurrentPosition(0);
@@ -317,10 +319,13 @@ void homeAxis(AccelStepper &stepper, int endstopPin, float homeDirection) {
   // Finally, define this new position as 0 again
   stepper.setCurrentPosition(0);
 
+  /*
   Serial.print("Axis on pin ");
   Serial.print(endstopPin);
   Serial.println(" homed. CurrentPosition set to 0.");
+  */
 }
+
 
 // Function to read all hall effect sensors and return a 36-digit string
 String readBoardState() {
