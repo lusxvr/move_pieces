@@ -170,6 +170,7 @@ void movePiece(float startXmm, float startYmm, float endXmm, float endYmm) {
   homeAxis(stepperX, X_ENDSTOP_PIN, HOMING_DIR_X * STEPS_PER_MM_X);
   homeAxis(stepperY, Y_ENDSTOP_PIN, HOMING_DIR_Y * STEPS_PER_MM_Y);
   Serial.println("Re-homing complete.");
+  Serial.println("OK"); // Here to acknowledge completed move to server
 }
 
 /**
